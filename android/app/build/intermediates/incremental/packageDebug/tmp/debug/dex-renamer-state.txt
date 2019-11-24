@@ -1,0 +1,4 @@
+#Sat Nov 23 21:13:08 BRST 2019
+base.0=/home/gustavo/react-native/fbrn/android/app/build/intermediates/transforms/dexMerger/debug/0
+renamed.0=classes.dex
+path.0=classes.dex
