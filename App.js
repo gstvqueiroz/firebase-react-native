@@ -4,7 +4,8 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  Alert
+  Alert,
+  Dimensions
 } from 'react-native'
 
 import * as firebase from 'firebase'
@@ -14,9 +15,10 @@ firebase.initializeApp(firebaseConfig)
 
 class App extends Component {
   state = {
-    email:'',
-    password:'',
-    logIn:'Falso'
+    email:'xxx@gmail.com',
+    password:'xxx-1234',
+    logIn:'Falso',
+    pontuacao:'0'
   }
 
   signUpUser(email,password){
@@ -38,7 +40,12 @@ class App extends Component {
         return
       }
       firebase.auth().signInWithEmailAndPassword(email, password)
-      this.setState({logIn:'Verdadeiro'})
+        .then(
+          response => this.setState({logIn:'Verdadeiro'})
+        ).catch(
+          error => this.setState({logIn:"Senha Incorreta"})
+        )
+      
     } catch (error) {
       console.log(error.toString())
     }
@@ -52,24 +59,60 @@ class App extends Component {
   
     ref.set({
       uid,
-      name: 'Gustavo Queiroz',
+      name: 'xxx xxx',
       role: 'admin'
     });
+  }
+
+  salvarDados() {
+    // var database = firebase.database()
+    // database.ref("pontuacao").set("100")
+    var funcionarios = firebase.database().ref("funcionarios")
+    funcionarios.child("002").child("nome").set("xxx")
+    funcionarios.child("002").child("sobrenome").set("xxx")
+    funcionarios.child("002").child("email").set("xxx@gmail.com")
+  }
+
+  removerDados() {
+    var database = firebase.database()
+    database.ref("aluno").remove()
+  }
+
+  listarDados() {
+    var pontuacao = firebase.database().ref("pontuacao")
+    pontuacao.on('value', (snapshot) => {
+      // alert(snapshot.val())
+      this.setState({pontuacao:snapshot.val()})
+    })
   }
 
   render() {
     return (
       <View style={styles.container}>
+        <View style={styles.quadrado}></View>
+        <Text>Email: {this.state.email}</Text>
+        <Text>Senha: {this.state.password}</Text>
         <Text>Login: {this.state.logIn}</Text>
-        <TouchableOpacity onPress={() => this.signUpUser(this.state.email, this.state.password)}>
-          <Text>SignUp</Text>
+        <Text>Pontuação: {this.state.pontuacao}</Text>
+        <TouchableOpacity style={styles.button} onPress={() => this.signUpUser(this.state.email, this.state.password)}>
+          <Text>Sign Up</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => this.signInUser(this.state.email, this.state.password)}>
-          <Text>SignIn</Text>
+        <TouchableOpacity style={styles.button} onPress={() => this.signInUser(this.state.email, this.state.password)}>
+          <Text>Sign In</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => this.dataBase()}>
+        <TouchableOpacity style={styles.button} onPress={() => this.dataBase()}>
           <Text>Input Value</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => this.salvarDados()}>
+          <Text>Salvar Dados</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => this.removerDados()}>
+          <Text>Remover Dados</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => this.listarDados()}>
+          <Text>Listar Dados</Text>
+        </TouchableOpacity>
+
       </View>
     )
   }
@@ -78,6 +121,23 @@ class App extends Component {
 const styles = StyleSheet.create({
   container:{
     flex:1,
+    alignItems:'center',
+    justifyContent:'center'
+  },
+  quadrado:{
+    height:50,
+    width:50,
+    backgroundColor: 'blue',
+    margin:20,
+    borderRadius:25
+  },
+  button: {
+    borderWidth:2,
+    borderColor:'gray',
+    height:35,
+    width: Dimensions.get('window').width*1/2,
+    margin:15,
+    borderRadius:10,
     alignItems:'center',
     justifyContent:'center'
   }
